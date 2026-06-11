@@ -17,117 +17,177 @@
     </style>
 </head>
 <body class="min-h-screen text-slate-800 antialiased">
-    <header class="bg-white/85 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 shadow-sm">
-        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white"><i class="fa-solid fa-database"></i></div>
+    <section id="loginView" class="min-h-screen flex items-center justify-center px-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 w-full max-w-md">
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white mx-auto mb-3"><i class="fa-solid fa-lock"></i></div>
+                <h1 class="text-lg font-black text-slate-900">دخول الإدارة</h1>
+                <p class="text-xs text-slate-400 font-bold mt-1">هذه الصفحة مخصصة لحساب الإدارة فقط</p>
+            </div>
+            <form id="loginForm" class="space-y-3">
                 <div>
-                    <h1 class="font-black text-sm text-slate-900 leading-tight">إدارة بيانات الطلاب</h1>
-                    <p id="storageStatus" class="text-[10px] text-slate-400 font-semibold">لا توجد بيانات محفوظة</p>
+                    <label for="loginEmail" class="block text-[11px] font-bold text-slate-500 mb-1">البريد الإلكتروني</label>
+                    <input id="loginEmail" type="email" class="ltr-input w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" autocomplete="username" required>
                 </div>
-            </div>
-            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-blue-700 transition-colors" title="صفحة الاستعلام">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <span>الاستعلام</span>
-            </a>
+                <div>
+                    <label for="loginPassword" class="block text-[11px] font-bold text-slate-500 mb-1">كلمة المرور</label>
+                    <input id="loginPassword" type="password" class="ltr-input w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" autocomplete="current-password" required>
+                </div>
+                <button id="loginBtn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 text-sm font-black transition-colors">تسجيل الدخول</button>
+                <p id="loginMessage" class="text-xs font-bold text-red-600 text-center"></p>
+            </form>
         </div>
-    </header>
+    </section>
 
-    <main class="max-w-6xl mx-auto px-4 py-6 space-y-5">
-        <section class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-5">
-            <div class="space-y-5">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-                    <h2 class="font-black text-blue-700 mb-4">رفع ملف البيانات</h2>
-                    <label for="dataFile" class="block border-2 border-dashed border-blue-200 bg-blue-50/60 rounded-2xl p-5 text-center cursor-pointer hover:bg-blue-50 transition-colors">
-                        <i class="fa-solid fa-file-arrow-up text-3xl text-blue-600 mb-3"></i>
-                        <span class="block text-sm font-black text-slate-800">اختر ملف CSV أو JSON</span>
-                        <span class="block text-[11px] text-slate-500 font-bold mt-1">يجب أن يحتوي على رقم الهوية</span>
-                    </label>
-                    <input id="dataFile" type="file" accept=".csv,.json,application/json,text/csv" class="hidden">
-                    <div class="grid grid-cols-2 gap-2 mt-4">
-                        <button id="downloadBtn" type="button" class="bg-slate-800 hover:bg-slate-900 text-white rounded-xl py-2 text-xs font-bold transition-colors"><i class="fa-solid fa-download ml-1"></i> تصدير</button>
-                        <button id="clearBtn" type="button" class="bg-red-600 hover:bg-red-700 text-white rounded-xl py-2 text-xs font-bold transition-colors"><i class="fa-solid fa-trash ml-1"></i> إزالة الملف</button>
+    <section id="adminView" class="hidden">
+        <header class="bg-white/85 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 shadow-sm">
+            <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white"><i class="fa-solid fa-database"></i></div>
+                    <div>
+                        <h1 class="font-black text-sm text-slate-900 leading-tight">إدارة بيانات الطلاب</h1>
+                        <p id="storageStatus" class="text-[10px] text-slate-400 font-semibold">جارٍ تحميل البيانات...</p>
                     </div>
-                    <p id="uploadMessage" class="text-xs font-bold mt-4 text-slate-500"></p>
                 </div>
-
-                <form id="studentForm" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <h2 id="formTitle" class="font-black text-blue-700">إضافة طالب</h2>
-                        <button id="resetFormBtn" type="button" class="text-xs font-bold text-slate-400 hover:text-slate-700">تفريغ</button>
-                    </div>
-                    <input type="hidden" id="editingIndex">
-                    <div>
-                        <label for="studentId" class="block text-[11px] font-bold text-slate-500 mb-1">رقم الهوية</label>
-                        <input id="studentId" class="ltr-input w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" maxlength="10" inputmode="numeric" required>
-                    </div>
-                    <div>
-                        <label for="studentName" class="block text-[11px] font-bold text-slate-500 mb-1">اسم الطالب</label>
-                        <input id="studentName" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" required>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label for="seatNumber" class="block text-[11px] font-bold text-slate-500 mb-1">رقم الجلوس</label>
-                            <input id="seatNumber" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
-                        </div>
-                        <div>
-                            <label for="grade" class="block text-[11px] font-bold text-slate-500 mb-1">الصف</label>
-                            <input id="grade" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label for="committee" class="block text-[11px] font-bold text-slate-500 mb-1">اللجنة</label>
-                            <input id="committee" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
-                        </div>
-                        <div>
-                            <label for="room" class="block text-[11px] font-bold text-slate-500 mb-1">القاعة</label>
-                            <input id="room" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="location" class="block text-[11px] font-bold text-slate-500 mb-1">مقر اللجنة</label>
-                        <input id="location" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 text-sm font-black transition-colors">حفظ البيانات</button>
-                </form>
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-blue-700 transition-colors" title="صفحة الاستعلام">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span>الاستعلام</span>
+                    </a>
+                    <button id="logoutBtn" type="button" class="inline-flex items-center gap-2 text-xs font-bold text-red-600 hover:text-red-700 transition-colors">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>خروج</span>
+                    </button>
+                </div>
             </div>
+        </header>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-                    <div>
-                        <h2 class="font-black text-slate-900">قائمة الطلاب</h2>
-                        <p id="studentsCount" class="text-[11px] text-slate-400 font-bold">0 طالب</p>
+        <main class="max-w-6xl mx-auto px-4 py-6 space-y-5">
+            <section class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-5">
+                <div class="space-y-5">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                        <h2 class="font-black text-blue-700 mb-4">رفع ملف البيانات</h2>
+                        <label for="dataFile" class="block border-2 border-dashed border-blue-200 bg-blue-50/60 rounded-2xl p-5 text-center cursor-pointer hover:bg-blue-50 transition-colors">
+                            <i class="fa-solid fa-file-arrow-up text-3xl text-blue-600 mb-3"></i>
+                            <span class="block text-sm font-black text-slate-800">اختر ملف CSV أو JSON</span>
+                            <span class="block text-[11px] text-slate-500 font-bold mt-1">سيتم حفظ البيانات في Firestore</span>
+                        </label>
+                        <input id="dataFile" type="file" accept=".csv,.json,application/json,text/csv" class="hidden">
+                        <div class="grid grid-cols-2 gap-2 mt-4">
+                            <button id="downloadBtn" type="button" class="bg-slate-800 hover:bg-slate-900 text-white rounded-xl py-2 text-xs font-bold transition-colors"><i class="fa-solid fa-download ml-1"></i> تصدير</button>
+                            <button id="clearBtn" type="button" class="bg-red-600 hover:bg-red-700 text-white rounded-xl py-2 text-xs font-bold transition-colors"><i class="fa-solid fa-trash ml-1"></i> إزالة الكل</button>
+                        </div>
+                        <p id="uploadMessage" class="text-xs font-bold mt-4 text-slate-500"></p>
                     </div>
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
-                        <input id="tableSearch" class="w-full sm:w-72 rounded-xl border border-slate-200 bg-slate-50 pr-9 pl-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" placeholder="بحث بالاسم أو الهوية">
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead class="bg-slate-50 text-slate-500 text-[11px]">
-                            <tr>
-                                <th class="text-right p-3 font-black">الهوية</th>
-                                <th class="text-right p-3 font-black">الاسم</th>
-                                <th class="text-right p-3 font-black">رقم الجلوس</th>
-                                <th class="text-right p-3 font-black">اللجنة</th>
-                                <th class="text-right p-3 font-black">القاعة</th>
-                                <th class="text-center p-3 font-black">الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentsTable" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
-                <div id="emptyState" class="hidden p-8 text-center text-slate-400 font-bold text-sm">لا توجد بيانات طلاب محفوظة</div>
-            </div>
-        </section>
-    </main>
 
-    <script>
-        const STUDENTS_STORAGE_KEY = 'examCommitteeStudents';
-        const fields = ['id', 'name', 'seat', 'grade', 'committee', 'room', 'location'];
-        let students = loadStudents();
+                    <form id="studentForm" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h2 id="formTitle" class="font-black text-blue-700">إضافة طالب</h2>
+                            <button id="resetFormBtn" type="button" class="text-xs font-bold text-slate-400 hover:text-slate-700">تفريغ</button>
+                        </div>
+                        <input type="hidden" id="editingId">
+                        <div>
+                            <label for="studentId" class="block text-[11px] font-bold text-slate-500 mb-1">رقم الهوية</label>
+                            <input id="studentId" class="ltr-input w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" maxlength="10" inputmode="numeric" required>
+                        </div>
+                        <div>
+                            <label for="studentName" class="block text-[11px] font-bold text-slate-500 mb-1">اسم الطالب</label>
+                            <input id="studentName" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label for="seatNumber" class="block text-[11px] font-bold text-slate-500 mb-1">رقم الجلوس</label>
+                                <input id="seatNumber" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
+                            </div>
+                            <div>
+                                <label for="grade" class="block text-[11px] font-bold text-slate-500 mb-1">الصف</label>
+                                <input id="grade" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label for="committee" class="block text-[11px] font-bold text-slate-500 mb-1">اللجنة</label>
+                                <input id="committee" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
+                            </div>
+                            <div>
+                                <label for="room" class="block text-[11px] font-bold text-slate-500 mb-1">القاعة</label>
+                                <input id="room" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="location" class="block text-[11px] font-bold text-slate-500 mb-1">مقر اللجنة</label>
+                            <input id="location" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
+                        </div>
+                        <button id="saveStudentBtn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 text-sm font-black transition-colors">حفظ البيانات</button>
+                    </form>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+                        <div>
+                            <h2 class="font-black text-slate-900">قائمة الطلاب</h2>
+                            <p id="studentsCount" class="text-[11px] text-slate-400 font-bold">0 طالب</p>
+                        </div>
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+                            <input id="tableSearch" class="w-full sm:w-72 rounded-xl border border-slate-200 bg-slate-50 pr-9 pl-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" placeholder="بحث بالاسم أو الهوية">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-slate-50 text-slate-500 text-[11px]">
+                                <tr>
+                                    <th class="text-right p-3 font-black">الهوية</th>
+                                    <th class="text-right p-3 font-black">الاسم</th>
+                                    <th class="text-right p-3 font-black">رقم الجلوس</th>
+                                    <th class="text-right p-3 font-black">اللجنة</th>
+                                    <th class="text-right p-3 font-black">القاعة</th>
+                                    <th class="text-center p-3 font-black">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTable" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                    <div id="emptyState" class="hidden p-8 text-center text-slate-400 font-bold text-sm">لا توجد بيانات طلاب محفوظة</div>
+                </div>
+            </section>
+        </main>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signInWithEmailAndPassword,
+            signOut
+        } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+        import {
+            getFirestore,
+            collection,
+            deleteDoc,
+            doc,
+            getDocs,
+            orderBy,
+            query,
+            setDoc,
+            writeBatch
+        } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: 'AIzaSyCZ5MeVKZu26bhi4EShohEcEMtCsCqCo7s',
+            authDomain: 'abbad-9d546.firebaseapp.com',
+            projectId: 'abbad-9d546',
+            storageBucket: 'abbad-9d546.firebasestorage.app',
+            messagingSenderId: '728461915197',
+            appId: '1:728461915197:web:940a4b5006ba3439e82654'
+        };
+
+        const ADMIN_EMAIL = 'abbadschooll@gmail.com';
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let students = [];
 
         const fieldMap = {
             id: ['id', 'studentId', 'nationalId', 'identity', 'رقم الهوية', 'الهوية', 'السجل المدني'],
@@ -147,20 +207,6 @@
                 '"': '&quot;',
                 "'": '&#39;'
             }[char]));
-        }
-
-        function loadStudents() {
-            try {
-                const raw = localStorage.getItem(STUDENTS_STORAGE_KEY);
-                return raw ? JSON.parse(raw) : [];
-            } catch (error) {
-                return [];
-            }
-        }
-
-        function saveStudents() {
-            localStorage.setItem(STUDENTS_STORAGE_KEY, JSON.stringify(students));
-            renderTable();
         }
 
         function normalizeId(value) {
@@ -184,7 +230,8 @@
                 grade: String(getValue(row, 'grade')).trim(),
                 committee: String(getValue(row, 'committee')).trim(),
                 room: String(getValue(row, 'room')).trim(),
-                location: String(getValue(row, 'location')).trim()
+                location: String(getValue(row, 'location')).trim(),
+                updatedAt: new Date().toISOString()
             };
         }
 
@@ -244,48 +291,51 @@
             messageEl.textContent = message;
         }
 
+        function showLoginMessage(message) {
+            document.getElementById('loginMessage').textContent = message;
+        }
+
         function renderTable() {
-            const query = document.getElementById('tableSearch').value.trim().toLowerCase();
+            const queryText = document.getElementById('tableSearch').value.trim().toLowerCase();
             const rows = students.filter((student) => {
-                return !query || [student.id, student.name, student.seat, student.committee, student.room].some((value) => String(value).toLowerCase().includes(query));
+                return !queryText || [student.id, student.name, student.seat, student.committee, student.room].some((value) => String(value).toLowerCase().includes(queryText));
             });
             const table = document.getElementById('studentsTable');
             document.getElementById('studentsCount').textContent = `${students.length} طالب`;
-            document.getElementById('storageStatus').textContent = students.length ? `محفوظ ${students.length} طالب` : 'لا توجد بيانات محفوظة';
+            document.getElementById('storageStatus').textContent = students.length ? `محفوظ ${students.length} طالب في Firestore` : 'لا توجد بيانات محفوظة';
             document.getElementById('emptyState').classList.toggle('hidden', students.length > 0);
 
-            table.innerHTML = rows.map((student, visibleIndex) => {
-                const index = students.indexOf(student);
-                return `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-bold ltr-input text-left">${escapeHtml(student.id)}</td>
-                        <td class="p-3 font-bold">${escapeHtml(student.name || 'غير محدد')}</td>
-                        <td class="p-3">${escapeHtml(student.seat || '-')}</td>
-                        <td class="p-3">${escapeHtml(student.committee || '-')}</td>
-                        <td class="p-3">${escapeHtml(student.room || '-')}</td>
-                        <td class="p-3">
-                            <div class="flex items-center justify-center gap-2">
-                                <button type="button" class="editBtn w-9 h-9 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100" data-index="${index}" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                                <button type="button" class="deleteBtn w-9 h-9 rounded-lg bg-red-50 text-red-700 hover:bg-red-100" data-index="${index}" title="حذف"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            table.innerHTML = rows.map((student) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-bold ltr-input text-left">${escapeHtml(student.id)}</td>
+                    <td class="p-3 font-bold">${escapeHtml(student.name || 'غير محدد')}</td>
+                    <td class="p-3">${escapeHtml(student.seat || '-')}</td>
+                    <td class="p-3">${escapeHtml(student.committee || '-')}</td>
+                    <td class="p-3">${escapeHtml(student.room || '-')}</td>
+                    <td class="p-3">
+                        <div class="flex items-center justify-center gap-2">
+                            <button type="button" class="editBtn w-9 h-9 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100" data-id="${escapeHtml(student.id)}" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" class="deleteBtn w-9 h-9 rounded-lg bg-red-50 text-red-700 hover:bg-red-100" data-id="${escapeHtml(student.id)}" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
         }
 
         function resetForm() {
-            document.getElementById('editingIndex').value = '';
+            document.getElementById('editingId').value = '';
             document.getElementById('formTitle').textContent = 'إضافة طالب';
+            document.getElementById('studentId').disabled = false;
             document.getElementById('studentForm').reset();
         }
 
-        function fillForm(index) {
-            const student = students[index];
+        function fillForm(id) {
+            const student = students.find((item) => item.id === id);
             if (!student) return;
-            document.getElementById('editingIndex').value = index;
+            document.getElementById('editingId').value = student.id;
             document.getElementById('formTitle').textContent = 'تعديل طالب';
             document.getElementById('studentId').value = student.id;
+            document.getElementById('studentId').disabled = true;
             document.getElementById('studentName').value = student.name;
             document.getElementById('seatNumber').value = student.seat;
             document.getElementById('grade').value = student.grade;
@@ -295,38 +345,119 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        async function loadStudentsFromFirestore() {
+            document.getElementById('storageStatus').textContent = 'جارٍ تحميل البيانات...';
+            const snapshot = await getDocs(query(collection(db, 'students'), orderBy('name')));
+            students = snapshot.docs.map((studentDoc) => ({ id: studentDoc.id, ...studentDoc.data() }));
+            renderTable();
+        }
+
+        async function saveStudent(student) {
+            await setDoc(doc(db, 'students', student.id), student);
+            const existingIndex = students.findIndex((item) => item.id === student.id);
+            if (existingIndex === -1) {
+                students.push(student);
+            } else {
+                students[existingIndex] = student;
+            }
+            students.sort((a, b) => String(a.name).localeCompare(String(b.name), 'ar'));
+            renderTable();
+        }
+
+        async function deleteStudentsByIds(ids) {
+            for (let i = 0; i < ids.length; i += 450) {
+                const batch = writeBatch(db);
+                ids.slice(i, i + 450).forEach((id) => batch.delete(doc(db, 'students', id)));
+                await batch.commit();
+            }
+        }
+
+        async function uploadStudents(newStudents) {
+            const newIds = new Set(newStudents.map((student) => student.id));
+            const oldIdsToDelete = students
+                .map((student) => student.id)
+                .filter((id) => !newIds.has(id));
+
+            if (oldIdsToDelete.length) {
+                await deleteStudentsByIds(oldIdsToDelete);
+            }
+
+            for (let i = 0; i < newStudents.length; i += 450) {
+                const batch = writeBatch(db);
+                newStudents.slice(i, i + 450).forEach((student) => {
+                    batch.set(doc(db, 'students', student.id), student);
+                });
+                await batch.commit();
+            }
+            students = newStudents.sort((a, b) => String(a.name).localeCompare(String(b.name), 'ar'));
+            renderTable();
+        }
+
+        function setAdminVisible(isVisible) {
+            document.getElementById('loginView').classList.toggle('hidden', isVisible);
+            document.getElementById('adminView').classList.toggle('hidden', !isVisible);
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            showLoginMessage('');
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
+            const button = document.getElementById('loginBtn');
+            button.disabled = true;
+            button.textContent = 'جارٍ الدخول...';
+
+            try {
+                if (email !== ADMIN_EMAIL) {
+                    showLoginMessage('هذا البريد غير مصرح له بالدخول.');
+                    return;
+                }
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                showLoginMessage('تعذر تسجيل الدخول. تأكد من البريد وكلمة المرور.');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'تسجيل الدخول';
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
         document.getElementById('dataFile').addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (!file) return;
             try {
+                showMessage('جارٍ قراءة الملف...', 'text-slate-500');
                 const text = await file.text();
                 const parsedRows = parseFile(file, text);
                 const normalized = parsedRows.map(normalizeStudent).filter((student) => student.id.length === 10);
-                if (!normalized.length) {
+                const unique = Array.from(new Map(normalized.map((student) => [student.id, student])).values());
+                if (!unique.length) {
                     showMessage('لم يتم العثور على سجلات تحتوي على رقم هوية صحيح من 10 أرقام.', 'text-red-600');
                     return;
                 }
-                students = normalized;
-                saveStudents();
+                await uploadStudents(unique);
                 resetForm();
-                showMessage(`تم رفع ${students.length} طالب بنجاح.`, 'text-green-700');
+                showMessage(`تم رفع ${unique.length} طالب بنجاح إلى Firestore.`, 'text-green-700');
             } catch (error) {
-                showMessage('تعذر قراءة الملف. تأكد من أن الملف بصيغة CSV أو JSON صحيحة.', 'text-red-600');
+                showMessage('تعذر رفع الملف. تأكد من صلاحيات Firestore ومن صيغة الملف.', 'text-red-600');
             } finally {
                 event.target.value = '';
             }
         });
 
-        document.getElementById('studentForm').addEventListener('submit', (event) => {
+        document.getElementById('studentForm').addEventListener('submit', async (event) => {
             event.preventDefault();
+            const editingId = document.getElementById('editingId').value;
             const student = {
-                id: normalizeId(document.getElementById('studentId').value),
+                id: editingId || normalizeId(document.getElementById('studentId').value),
                 name: document.getElementById('studentName').value.trim(),
                 seat: document.getElementById('seatNumber').value.trim(),
                 grade: document.getElementById('grade').value.trim(),
                 committee: document.getElementById('committee').value.trim(),
                 room: document.getElementById('room').value.trim(),
-                location: document.getElementById('location').value.trim()
+                location: document.getElementById('location').value.trim(),
+                updatedAt: new Date().toISOString()
             };
 
             if (student.id.length !== 10 || !student.name) {
@@ -334,39 +465,41 @@
                 return;
             }
 
-            const editingIndex = document.getElementById('editingIndex').value;
-            const duplicateIndex = students.findIndex((item, index) => item.id === student.id && String(index) !== editingIndex);
-            if (duplicateIndex !== -1) {
-                showMessage('يوجد طالب محفوظ بنفس رقم الهوية.', 'text-red-600');
-                return;
-            }
+            const button = document.getElementById('saveStudentBtn');
+            button.disabled = true;
+            button.textContent = 'جارٍ الحفظ...';
 
-            if (editingIndex !== '') {
-                students[Number(editingIndex)] = student;
-                showMessage('تم تعديل بيانات الطالب.', 'text-green-700');
-            } else {
-                students.push(student);
-                showMessage('تمت إضافة الطالب.', 'text-green-700');
+            try {
+                await saveStudent(student);
+                resetForm();
+                showMessage(editingId ? 'تم تعديل بيانات الطالب.' : 'تمت إضافة الطالب.', 'text-green-700');
+            } catch (error) {
+                showMessage('تعذر حفظ البيانات. تأكد من صلاحيات الحساب.', 'text-red-600');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'حفظ البيانات';
             }
-
-            saveStudents();
-            resetForm();
         });
 
-        document.getElementById('studentsTable').addEventListener('click', (event) => {
+        document.getElementById('studentsTable').addEventListener('click', async (event) => {
             const editBtn = event.target.closest('.editBtn');
             const deleteBtn = event.target.closest('.deleteBtn');
             if (editBtn) {
-                fillForm(Number(editBtn.dataset.index));
+                fillForm(editBtn.dataset.id);
             }
             if (deleteBtn) {
-                const index = Number(deleteBtn.dataset.index);
-                const student = students[index];
+                const id = deleteBtn.dataset.id;
+                const student = students.find((item) => item.id === id);
                 if (student && confirm(`هل تريد حذف بيانات الطالب: ${student.name || student.id}؟`)) {
-                    students.splice(index, 1);
-                    saveStudents();
-                    resetForm();
-                    showMessage('تم حذف الطالب من البيانات المحفوظة.', 'text-green-700');
+                    try {
+                        await deleteDoc(doc(db, 'students', id));
+                        students = students.filter((item) => item.id !== id);
+                        renderTable();
+                        resetForm();
+                        showMessage('تم حذف الطالب من Firestore.', 'text-green-700');
+                    } catch (error) {
+                        showMessage('تعذر حذف الطالب. تأكد من صلاحيات الحساب.', 'text-red-600');
+                    }
                 }
             }
         });
@@ -374,17 +507,21 @@
         document.getElementById('tableSearch').addEventListener('input', renderTable);
         document.getElementById('resetFormBtn').addEventListener('click', resetForm);
 
-        document.getElementById('clearBtn').addEventListener('click', () => {
+        document.getElementById('clearBtn').addEventListener('click', async () => {
             if (!students.length) {
                 showMessage('لا توجد بيانات لإزالتها.', 'text-slate-500');
                 return;
             }
-            if (confirm('هل تريد إزالة ملف بيانات الطلاب المحفوظ من هذا المتصفح؟')) {
-                students = [];
-                localStorage.removeItem(STUDENTS_STORAGE_KEY);
-                renderTable();
-                resetForm();
-                showMessage('تمت إزالة ملف البيانات المحفوظ.', 'text-green-700');
+            if (confirm('هل تريد حذف جميع بيانات الطلاب من Firestore؟')) {
+                try {
+                    await deleteStudentsByIds(students.map((student) => student.id));
+                    students = [];
+                    renderTable();
+                    resetForm();
+                    showMessage('تم حذف جميع بيانات الطلاب.', 'text-green-700');
+                } catch (error) {
+                    showMessage('تعذر حذف جميع البيانات. تأكد من صلاحيات الحساب.', 'text-red-600');
+                }
             }
         });
 
@@ -402,7 +539,21 @@
             URL.revokeObjectURL(url);
         });
 
-        renderTable();
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                setAdminVisible(false);
+                students = [];
+                return;
+            }
+            if (user.email?.toLowerCase() !== ADMIN_EMAIL) {
+                await signOut(auth);
+                showLoginMessage('هذا الحساب غير مصرح له بالدخول.');
+                setAdminVisible(false);
+                return;
+            }
+            setAdminVisible(true);
+            await loadStudentsFromFirestore();
+        });
     </script>
 </body>
 </html>

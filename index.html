@@ -17,7 +17,6 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between text-slate-800 antialiased">
-
     <header id="mainHeader" class="bg-white/85 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 shadow-sm">
         <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3 min-w-0">
@@ -27,10 +26,6 @@
                     <p class="text-[10px] text-slate-400 font-semibold">تبوك 1447 هـ</p>
                 </div>
             </div>
-            <a href="admin.html" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-blue-700 transition-colors" title="إدارة بيانات الطلاب">
-                <i class="fa-solid fa-gear"></i>
-                <span>الإدارة</span>
-            </a>
         </div>
     </header>
 
@@ -50,7 +45,7 @@
                                placeholder="1234567890">
                         <p class="text-[10px] text-red-500 font-bold mt-2"><i class="fa-solid fa-circle-info ml-1"></i> يرجى إدخال 10 أرقام باللغة الإنجليزية فقط</p>
                     </div>
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-md">عرض بطاقة اللجنة</button>
+                    <button id="searchBtn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-md">عرض بطاقة اللجنة</button>
                 </form>
             </div>
 
@@ -98,8 +93,21 @@
         </div>
     </footer>
 
-    <script>
-        const STUDENTS_STORAGE_KEY = 'examCommitteeStudents';
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: 'AIzaSyCZ5MeVKZu26bhi4EShohEcEMtCsCqCo7s',
+            authDomain: 'abbad-9d546.firebaseapp.com',
+            projectId: 'abbad-9d546',
+            storageBucket: 'abbad-9d546.firebasestorage.app',
+            messagingSenderId: '728461915197',
+            appId: '1:728461915197:web:940a4b5006ba3439e82654'
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -111,58 +119,8 @@
             }[char]));
         }
 
-        function loadStudents() {
-            try {
-                const raw = localStorage.getItem(STUDENTS_STORAGE_KEY);
-                return raw ? JSON.parse(raw) : [];
-            } catch (error) {
-                return [];
-            }
-        }
-
-        function getStudentValue(student, keys) {
-            for (const key of keys) {
-                if (student[key] !== undefined && student[key] !== null && String(student[key]).trim() !== '') {
-                    return student[key];
-                }
-            }
-            return '';
-        }
-
         function normalizeId(value) {
             return String(value ?? '').replace(/\D/g, '').slice(0, 10);
-        }
-
-        function findStudent(students, id) {
-            return students.find((student) => normalizeId(getStudentValue(student, ['id', 'studentId', 'nationalId', 'identity', 'رقم الهوية', 'الهوية', 'السجل المدني'])) === id);
-        }
-
-        function renderStudent(student) {
-            const name = getStudentValue(student, ['name', 'studentName', 'اسم الطالب', 'الاسم']) || 'غير محدد';
-            const id = normalizeId(getStudentValue(student, ['id', 'studentId', 'nationalId', 'identity', 'رقم الهوية', 'الهوية', 'السجل المدني']));
-            const seat = getStudentValue(student, ['seat', 'seatNumber', 'رقم الجلوس', 'رقم الجلوس/المقعد']);
-            const committee = getStudentValue(student, ['committee', 'committeeName', 'اللجنة', 'لجنة']);
-            const room = getStudentValue(student, ['room', 'hall', 'classroom', 'القاعة', 'الفصل']);
-            const grade = getStudentValue(student, ['grade', 'class', 'الصف', 'الفصل الدراسي']);
-            const location = getStudentValue(student, ['location', 'place', 'مقر اللجنة', 'المقر']);
-
-            document.getElementById('emptyPanel').classList.add('hidden');
-            const resultPanel = document.getElementById('resultPanel');
-            resultPanel.classList.remove('hidden');
-            resultPanel.innerHTML = `
-                <div class="bg-blue-600 text-white p-5 text-center">
-                    <p class="text-xs font-bold opacity-80">بطاقة اللجنة</p>
-                    <h3 class="text-xl font-black mt-1">${escapeHtml(name)}</h3>
-                </div>
-                <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                    ${renderField('رقم الهوية', id)}
-                    ${renderField('رقم الجلوس', seat)}
-                    ${renderField('اللجنة', committee)}
-                    ${renderField('القاعة', room)}
-                    ${renderField('الصف', grade)}
-                    ${renderField('مقر اللجنة', location)}
-                </div>
-            `;
         }
 
         function renderField(label, value) {
@@ -174,6 +132,26 @@
             `;
         }
 
+        function renderStudent(student) {
+            document.getElementById('emptyPanel').classList.add('hidden');
+            const resultPanel = document.getElementById('resultPanel');
+            resultPanel.classList.remove('hidden');
+            resultPanel.innerHTML = `
+                <div class="bg-blue-600 text-white p-5 text-center">
+                    <p class="text-xs font-bold opacity-80">بطاقة اللجنة</p>
+                    <h3 class="text-xl font-black mt-1">${escapeHtml(student.name || 'غير محدد')}</h3>
+                </div>
+                <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    ${renderField('رقم الهوية', student.id)}
+                    ${renderField('رقم الجلوس', student.seat)}
+                    ${renderField('اللجنة', student.committee)}
+                    ${renderField('القاعة', student.room)}
+                    ${renderField('الصف', student.grade)}
+                    ${renderField('مقر اللجنة', student.location)}
+                </div>
+            `;
+        }
+
         function showMessage(message) {
             document.getElementById('resultPanel').classList.add('hidden');
             const emptyPanel = document.getElementById('emptyPanel');
@@ -181,7 +159,12 @@
             emptyPanel.classList.remove('hidden');
         }
 
-        document.getElementById('searchForm').addEventListener('submit', (event) => {
+        async function searchStudent(id) {
+            const snapshot = await getDoc(doc(db, 'students', id));
+            return snapshot.exists() ? snapshot.data() : null;
+        }
+
+        document.getElementById('searchForm').addEventListener('submit', async (event) => {
             event.preventDefault();
             const id = normalizeId(document.getElementById('studentId').value);
             if (id.length !== 10) {
@@ -189,19 +172,23 @@
                 return;
             }
 
-            const students = loadStudents();
-            if (!students.length) {
-                showMessage('لم يتم رفع بيانات الطلاب بعد. يرجى التواصل مع الإدارة.');
-                return;
-            }
+            const button = document.getElementById('searchBtn');
+            button.disabled = true;
+            button.textContent = 'جارٍ البحث...';
 
-            const student = findStudent(students, id);
-            if (!student) {
-                showMessage('لم يتم العثور على بيانات لهذا الرقم.');
-                return;
+            try {
+                const student = await searchStudent(id);
+                if (!student) {
+                    showMessage('لم يتم العثور على بيانات لهذا الرقم.');
+                    return;
+                }
+                renderStudent({ ...student, id });
+            } catch (error) {
+                showMessage('تعذر الاتصال بقاعدة البيانات. تأكد من نشر قواعد Firestore بشكل صحيح.');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'عرض بطاقة اللجنة';
             }
-
-            renderStudent(student);
         });
     </script>
 </body>
