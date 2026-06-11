@@ -139,17 +139,22 @@
             resultPanel.innerHTML = `
                 <div class="bg-blue-600 text-white p-5 text-center">
                     <p class="text-xs font-bold opacity-80">بطاقة اللجنة</p>
-                    <h3 class="text-xl font-black mt-1">${escapeHtml(student.name || 'غير محدد')}</h3>
+                    <h3 class="text-xl font-black mt-1">بيانات الطالب</h3>
                 </div>
                 <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                    ${renderField('رقم الهوية', student.id)}
-                    ${renderField('رقم الجلوس', student.seat)}
-                    ${renderField('اللجنة', student.committee || student['رقم اللجنة'])}
-                    ${renderField('القاعة', student.room || student['اسم اللجنة'])}
+                    ${renderField('الاسم', student.name)}
                     ${renderField('الصف', student.grade || student['الصف/ الفصل'])}
                     ${renderField('مقر اللجنة', student.location || student['مقر اللجنة'])}
+                    ${renderField('رقم الجلوس', student.seat)}
+                </div>
+                <div class="px-5 pb-5">
+                    <button type="button" id="backToSearchBtn" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl transition-all">
+                        عودة
+                    </button>
                 </div>
             `;
+
+            document.getElementById('backToSearchBtn').addEventListener('click', resetSearch);
         }
 
         function showMessage(message) {
@@ -157,6 +162,14 @@
             const emptyPanel = document.getElementById('emptyPanel');
             emptyPanel.textContent = message;
             emptyPanel.classList.remove('hidden');
+        }
+
+        function resetSearch() {
+            document.getElementById('resultPanel').classList.add('hidden');
+            document.getElementById('emptyPanel').classList.add('hidden');
+            document.getElementById('searchForm').reset();
+            document.getElementById('studentId').focus();
+            document.getElementById('searchSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         async function searchStudent(id) {
