@@ -241,6 +241,10 @@
                 const found = normalizedEntries.find(([rowKey, value]) => rowKey === wantedKey && String(value ?? '').trim() !== '');
                 if (found) return found[1];
             }
+            if (key === 'id') {
+                const idValue = Object.values(row).find((value) => normalizeId(value).length === 10);
+                if (idValue !== undefined) return idValue;
+            }
             return '';
         }
 
@@ -299,6 +303,40 @@
             });
         }
 
+        function findHeaderRow(rows) {
+            const wantedKeys = Object.values(fieldMap).flat().map(normalizeKey);
+            return rows.findIndex((row) => {
+                const normalizedCells = row.map(normalizeKey);
+                const matches = normalizedCells.filter((cell) => wantedKeys.includes(cell)).length;
+                const hasTenDigitValue = row.some((cell) => normalizeId(cell).length === 10);
+                return matches >= 2 || hasTenDigitValue;
+            });
+        }
+
+        function rowsToObjects(rows) {
+            if (!rows.length) return [];
+            const headerIndex = findHeaderRow(rows);
+            if (headerIndex === -1) return [];
+
+            const headerRow = rows[headerIndex].map((cell, index) => {
+                const value = String(cell ?? '').trim();
+                return value || `column_${index + 1}`;
+            });
+
+            const headerLooksLikeData = headerRow.some((cell) => normalizeId(cell).length === 10);
+            const dataRows = rows.slice(headerLooksLikeData ? headerIndex : headerIndex + 1);
+
+            return dataRows
+                .map((row) => {
+                    const item = {};
+                    headerRow.forEach((header, index) => {
+                        item[header] = row[index] ?? '';
+                    });
+                    return item;
+                })
+                .filter((item) => Object.values(item).some((value) => String(value ?? '').trim() !== ''));
+        }
+
         async function parseFile(file) {
             const fileName = file.name.toLowerCase();
             if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls') || fileName.endsWith('.xlsm')) {
@@ -308,7 +346,8 @@
                 const buffer = await file.arrayBuffer();
                 const workbook = window.XLSX.read(buffer, { type: 'array' });
                 return workbook.SheetNames.flatMap((sheetName) => {
-                    return window.XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: '' });
+                    const rows = window.XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1, defval: '', raw: false });
+                    return rowsToObjects(rows);
                 });
             }
 
@@ -328,6 +367,11 @@
 
         function showLoginMessage(message) {
             document.getElementById('loginMessage').textContent = message;
+        }
+
+        function describeColumns(rows) {
+            const firstRow = rows.find((row) => Object.values(row).some((value) => String(value ?? '').trim() !== ''));
+            return firstRow ? Object.keys(firstRow).join('، ') : 'لم يتم العثور على أعمدة مقروءة';
         }
 
         function renderTable() {
@@ -467,7 +511,7 @@
                 const normalized = parsedRows.map(normalizeStudent).filter((student) => student.id.length === 10);
                 const unique = Array.from(new Map(normalized.map((student) => [student.id, student])).values());
                 if (!unique.length) {
-                    showMessage('لم يتم العثور على سجلات تحتوي على رقم هوية صحيح من 10 أرقام.', 'text-red-600');
+                    showMessage(`لم يتم العثور على سجلات تحتوي على رقم هوية صحيح من 10 أرقام. الأعمدة المقروءة: ${describeColumns(parsedRows)}`, 'text-red-600');
                     return;
                 }
                 await uploadStudents(unique);
