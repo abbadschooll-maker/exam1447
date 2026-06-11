@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدرسة عباد بن بشر الابتدائية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { cairo: ['Cairo', 'sans-serif'] } } } };
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; }
+        .animate-fade-in { animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-slate-800 antialiased">
+
+    <header id="mainHeader" class="bg-white/85 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-blue-700 rounded-xl flex items-center justify-center text-white shrink-0"><i class="fa-solid fa-graduation-cap"></i></div>
+                <div class="min-w-0">
+                    <h1 class="font-black text-sm text-slate-900 leading-tight">مدرسة عباد بن بشر الابتدائية</h1>
+                    <p class="text-[10px] text-slate-400 font-semibold">تبوك 1447 هـ</p>
+                </div>
+            </div>
+            <a href="admin.html" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-blue-700 transition-colors" title="إدارة بيانات الطلاب">
+                <i class="fa-solid fa-gear"></i>
+                <span>الإدارة</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-8">
+        <section id="searchSection" class="space-y-6 animate-fade-in">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col items-center text-center gap-2">
+                <h2 class="text-blue-600 font-black text-lg">اختبارات نهاية الفصل الدراسي الثاني 1447 هـ</h2>
+                <p class="text-xs text-slate-500 font-bold">صفحة الاستعلام عن مقر اللجنة للطالب ورقم الجلوس</p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 max-w-md mx-auto">
+                <form id="searchForm" class="space-y-4">
+                    <div class="text-center">
+                        <label for="studentId" class="block text-xs font-bold text-slate-500 mb-2">رقم الهوية الوطنية</label>
+                        <input type="text" id="studentId" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="يرجى إدخال 10 أرقام إنجليزية فقط"
+                               class="w-full text-center py-3 bg-slate-50 border border-slate-200 rounded-xl font-black text-lg tracking-widest focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500"
+                               placeholder="1234567890">
+                        <p class="text-[10px] text-red-500 font-bold mt-2"><i class="fa-solid fa-circle-info ml-1"></i> يرجى إدخال 10 أرقام باللغة الإنجليزية فقط</p>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-md">عرض بطاقة اللجنة</button>
+                </form>
+            </div>
+
+            <div id="resultPanel" class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden max-w-2xl mx-auto"></div>
+            <div id="emptyPanel" class="hidden bg-red-50 rounded-2xl border border-red-100 p-5 max-w-2xl mx-auto text-center text-red-700 font-bold text-sm"></div>
+
+            <div class="bg-amber-50/60 rounded-2xl p-6 border border-amber-100 shadow-inner">
+                <h5 class="font-extrabold text-amber-950 text-sm mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500"></i> تعليمات الاختبارات الهامة:
+                </h5>
+                <ul class="text-xs text-amber-900 leading-relaxed font-semibold list-disc list-inside space-y-2 mb-6">
+                    <li>يبدأ دخول الطلاب للجان الاختبارات الساعة 6:45 صباحاً، ويبدأ الاختبار تمام الساعة 7:00 صباحاً.</li>
+                    <li>يمنع منعاً باتاً إحضار الهواتف المحمولة أو الساعات الذكية أو المواد المطبوعة إلى داخل اللجان.</li>
+                    <li>يجب إحضار الأدوات المدرسية والقرطاسية الكاملة والخاصة بالطالب، حيث يمنع استعارتها داخل القاعة حفاظاً على الهدوء.</li>
+                    <li>يُرجى من ولي الأمر الاطلاع على جدول الاختبار والتأكد من مواد الاختبار وأيامها المقررة.</li>
+                </ul>
+
+                <div class="bg-white/60 p-4 rounded-xl border border-amber-100 text-center mb-6">
+                    <p class="text-blue-700 font-black text-sm">
+                        <i class="fa-solid fa-star text-amber-400"></i> عزيزي الطالب، ثقتنا في تميزك لا حدود لها.. استعن بالله، ركز جيداً، وتذكر أنك فخر لمدرستك وأهلك. بالتوفيق والنجاح!
+                    </p>
+                </div>
+
+                <div class="pt-4 border-t border-amber-200">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                        <div class="p-2">
+                            <p class="text-[10px] text-amber-800 font-bold">إعداد:</p>
+                            <p class="text-sm text-amber-950 font-black">د. محمد رحيل الشمري</p>
+                            <p class="text-[10px] text-amber-700 font-semibold">وكيل الشؤون التعليمية</p>
+                        </div>
+                        <div class="p-2">
+                            <p class="text-[10px] text-amber-800 font-bold">إشراف:</p>
+                            <p class="text-sm text-amber-950 font-black">أ. محمود صالح البلوي</p>
+                            <p class="text-[10px] text-amber-700 font-semibold">مدير المدرسة</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-slate-100 py-6">
+        <div class="text-center text-[11px] text-slate-400 font-medium">
+            مدرسة عباد بن بشر الابتدائية - لجنة التحصيل الدراسي 1447 هـ
+        </div>
+    </footer>
+
+    <script>
+        const STUDENTS_STORAGE_KEY = 'examCommitteeStudents';
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        function loadStudents() {
+            try {
+                const raw = localStorage.getItem(STUDENTS_STORAGE_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function getStudentValue(student, keys) {
+            for (const key of keys) {
+                if (student[key] !== undefined && student[key] !== null && String(student[key]).trim() !== '') {
+                    return student[key];
+                }
+            }
+            return '';
+        }
+
+        function normalizeId(value) {
+            return String(value ?? '').replace(/\D/g, '').slice(0, 10);
+        }
+
+        function findStudent(students, id) {
+            return students.find((student) => normalizeId(getStudentValue(student, ['id', 'studentId', 'nationalId', 'identity', 'رقم الهوية', 'الهوية', 'السجل المدني'])) === id);
+        }
+
+        function renderStudent(student) {
+            const name = getStudentValue(student, ['name', 'studentName', 'اسم الطالب', 'الاسم']) || 'غير محدد';
+            const id = normalizeId(getStudentValue(student, ['id', 'studentId', 'nationalId', 'identity', 'رقم الهوية', 'الهوية', 'السجل المدني']));
+            const seat = getStudentValue(student, ['seat', 'seatNumber', 'رقم الجلوس', 'رقم الجلوس/المقعد']);
+            const committee = getStudentValue(student, ['committee', 'committeeName', 'اللجنة', 'لجنة']);
+            const room = getStudentValue(student, ['room', 'hall', 'classroom', 'القاعة', 'الفصل']);
+            const grade = getStudentValue(student, ['grade', 'class', 'الصف', 'الفصل الدراسي']);
+            const location = getStudentValue(student, ['location', 'place', 'مقر اللجنة', 'المقر']);
+
+            document.getElementById('emptyPanel').classList.add('hidden');
+            const resultPanel = document.getElementById('resultPanel');
+            resultPanel.classList.remove('hidden');
+            resultPanel.innerHTML = `
+                <div class="bg-blue-600 text-white p-5 text-center">
+                    <p class="text-xs font-bold opacity-80">بطاقة اللجنة</p>
+                    <h3 class="text-xl font-black mt-1">${escapeHtml(name)}</h3>
+                </div>
+                <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    ${renderField('رقم الهوية', id)}
+                    ${renderField('رقم الجلوس', seat)}
+                    ${renderField('اللجنة', committee)}
+                    ${renderField('القاعة', room)}
+                    ${renderField('الصف', grade)}
+                    ${renderField('مقر اللجنة', location)}
+                </div>
+            `;
+        }
+
+        function renderField(label, value) {
+            return `
+                <div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
+                    <p class="text-[11px] text-slate-400 font-bold mb-1">${label}</p>
+                    <p class="font-black text-slate-800">${escapeHtml(value || 'غير محدد')}</p>
+                </div>
+            `;
+        }
+
+        function showMessage(message) {
+            document.getElementById('resultPanel').classList.add('hidden');
+            const emptyPanel = document.getElementById('emptyPanel');
+            emptyPanel.textContent = message;
+            emptyPanel.classList.remove('hidden');
+        }
+
+        document.getElementById('searchForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const id = normalizeId(document.getElementById('studentId').value);
+            if (id.length !== 10) {
+                showMessage('يرجى إدخال رقم هوية صحيح من 10 أرقام.');
+                return;
+            }
+
+            const students = loadStudents();
+            if (!students.length) {
+                showMessage('لم يتم رفع بيانات الطلاب بعد. يرجى التواصل مع الإدارة.');
+                return;
+            }
+
+            const student = findStudent(students, id);
+            if (!student) {
+                showMessage('لم يتم العثور على بيانات لهذا الرقم.');
+                return;
+            }
+
+            renderStudent(student);
+        });
+    </script>
+</body>
+</html>

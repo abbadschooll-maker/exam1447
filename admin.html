@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة بيانات الطلاب</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { cairo: ['Cairo', 'sans-serif'] } } } };
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; }
+        input, textarea { direction: rtl; }
+        .ltr-input { direction: ltr; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 antialiased">
+    <header class="bg-white/85 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white"><i class="fa-solid fa-database"></i></div>
+                <div>
+                    <h1 class="font-black text-sm text-slate-900 leading-tight">إدارة بيانات الطلاب</h1>
+                    <p id="storageStatus" class="text-[10px] text-slate-400 font-semibold">لا توجد بيانات محفوظة</p>
+                </div>
+            </div>
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-blue-700 transition-colors" title="صفحة الاستعلام">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>الاستعلام</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-6 space-y-5">
+        <section class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-5">
+            <div class="space-y-5">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                    <h2 class="font-black text-blue-700 mb-4">رفع ملف البيانات</h2>
+                    <label for="dataFile" class="block border-2 border-dashed border-blue-200 bg-blue-50/60 rounded-2xl p-5 text-center cursor-pointer hover:bg-blue-50 transition-colors">
+                        <i class="fa-solid fa-file-arrow-up text-3xl text-blue-600 mb-3"></i>
+                        <span class="block text-sm font-black text-slate-800">اختر ملف CSV أو JSON</span>
+                        <span class="block text-[11px] text-slate-500 font-bold mt-1">يجب أن يحتوي على رقم الهوية</span>
+                    </label>
+                    <input id="dataFile" type="file" accept=".csv,.json,application/json,text/csv" class="hidden">
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <button id="downloadBtn" type="button" class="bg-slate-800 hover:bg-slate-900 text-white rounded-xl py-2 text-xs font-bold transition-colors"><i class="fa-solid fa-download ml-1"></i> تصدير</button>
+                        <button id="clearBtn" type="button" class="bg-red-600 hover:bg-red-700 text-white rounded-xl py-2 text-xs font-bold transition-colors"><i class="fa-solid fa-trash ml-1"></i> إزالة الملف</button>
+                    </div>
+                    <p id="uploadMessage" class="text-xs font-bold mt-4 text-slate-500"></p>
+                </div>
+
+                <form id="studentForm" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h2 id="formTitle" class="font-black text-blue-700">إضافة طالب</h2>
+                        <button id="resetFormBtn" type="button" class="text-xs font-bold text-slate-400 hover:text-slate-700">تفريغ</button>
+                    </div>
+                    <input type="hidden" id="editingIndex">
+                    <div>
+                        <label for="studentId" class="block text-[11px] font-bold text-slate-500 mb-1">رقم الهوية</label>
+                        <input id="studentId" class="ltr-input w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" maxlength="10" inputmode="numeric" required>
+                    </div>
+                    <div>
+                        <label for="studentName" class="block text-[11px] font-bold text-slate-500 mb-1">اسم الطالب</label>
+                        <input id="studentName" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label for="seatNumber" class="block text-[11px] font-bold text-slate-500 mb-1">رقم الجلوس</label>
+                            <input id="seatNumber" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
+                        </div>
+                        <div>
+                            <label for="grade" class="block text-[11px] font-bold text-slate-500 mb-1">الصف</label>
+                            <input id="grade" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label for="committee" class="block text-[11px] font-bold text-slate-500 mb-1">اللجنة</label>
+                            <input id="committee" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
+                        </div>
+                        <div>
+                            <label for="room" class="block text-[11px] font-bold text-slate-500 mb-1">القاعة</label>
+                            <input id="room" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="location" class="block text-[11px] font-bold text-slate-500 mb-1">مقر اللجنة</label>
+                        <input id="location" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 text-sm font-black transition-colors">حفظ البيانات</button>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+                    <div>
+                        <h2 class="font-black text-slate-900">قائمة الطلاب</h2>
+                        <p id="studentsCount" class="text-[11px] text-slate-400 font-bold">0 طالب</p>
+                    </div>
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+                        <input id="tableSearch" class="w-full sm:w-72 rounded-xl border border-slate-200 bg-slate-50 pr-9 pl-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" placeholder="بحث بالاسم أو الهوية">
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-50 text-slate-500 text-[11px]">
+                            <tr>
+                                <th class="text-right p-3 font-black">الهوية</th>
+                                <th class="text-right p-3 font-black">الاسم</th>
+                                <th class="text-right p-3 font-black">رقم الجلوس</th>
+                                <th class="text-right p-3 font-black">اللجنة</th>
+                                <th class="text-right p-3 font-black">القاعة</th>
+                                <th class="text-center p-3 font-black">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTable" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+                <div id="emptyState" class="hidden p-8 text-center text-slate-400 font-bold text-sm">لا توجد بيانات طلاب محفوظة</div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const STUDENTS_STORAGE_KEY = 'examCommitteeStudents';
+        const fields = ['id', 'name', 'seat', 'grade', 'committee', 'room', 'location'];
+        let students = loadStudents();
+
+        const fieldMap = {
+            id: ['id', 'studentId', 'nationalId', 'identity', 'رقم الهوية', 'الهوية', 'السجل المدني'],
+            name: ['name', 'studentName', 'اسم الطالب', 'الاسم'],
+            seat: ['seat', 'seatNumber', 'رقم الجلوس', 'رقم الجلوس/المقعد'],
+            grade: ['grade', 'class', 'الصف', 'الفصل الدراسي'],
+            committee: ['committee', 'committeeName', 'اللجنة', 'لجنة'],
+            room: ['room', 'hall', 'classroom', 'القاعة', 'الفصل'],
+            location: ['location', 'place', 'مقر اللجنة', 'المقر']
+        };
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        function loadStudents() {
+            try {
+                const raw = localStorage.getItem(STUDENTS_STORAGE_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function saveStudents() {
+            localStorage.setItem(STUDENTS_STORAGE_KEY, JSON.stringify(students));
+            renderTable();
+        }
+
+        function normalizeId(value) {
+            return String(value ?? '').replace(/\D/g, '').slice(0, 10);
+        }
+
+        function getValue(row, key) {
+            for (const possibleKey of fieldMap[key]) {
+                if (row[possibleKey] !== undefined && row[possibleKey] !== null && String(row[possibleKey]).trim() !== '') {
+                    return row[possibleKey];
+                }
+            }
+            return '';
+        }
+
+        function normalizeStudent(row) {
+            return {
+                id: normalizeId(getValue(row, 'id')),
+                name: String(getValue(row, 'name')).trim(),
+                seat: String(getValue(row, 'seat')).trim(),
+                grade: String(getValue(row, 'grade')).trim(),
+                committee: String(getValue(row, 'committee')).trim(),
+                room: String(getValue(row, 'room')).trim(),
+                location: String(getValue(row, 'location')).trim()
+            };
+        }
+
+        function parseCsv(text) {
+            const rows = [];
+            let row = [];
+            let cell = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < text.length; i += 1) {
+                const char = text[i];
+                const next = text[i + 1];
+                if (char === '"' && inQuotes && next === '"') {
+                    cell += '"';
+                    i += 1;
+                } else if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    row.push(cell.trim());
+                    cell = '';
+                } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                    if (char === '\r' && next === '\n') i += 1;
+                    row.push(cell.trim());
+                    if (row.some(Boolean)) rows.push(row);
+                    row = [];
+                    cell = '';
+                } else {
+                    cell += char;
+                }
+            }
+
+            row.push(cell.trim());
+            if (row.some(Boolean)) rows.push(row);
+            if (!rows.length) return [];
+
+            const headers = rows[0].map((header) => header.replace(/^\uFEFF/, '').trim());
+            return rows.slice(1).map((cells) => {
+                const item = {};
+                headers.forEach((header, index) => {
+                    item[header] = cells[index] ?? '';
+                });
+                return item;
+            });
+        }
+
+        function parseFile(file, text) {
+            if (file.name.toLowerCase().endsWith('.json')) {
+                const parsed = JSON.parse(text);
+                return Array.isArray(parsed) ? parsed : parsed.students || [];
+            }
+            return parseCsv(text);
+        }
+
+        function showMessage(message, color = 'text-slate-500') {
+            const messageEl = document.getElementById('uploadMessage');
+            messageEl.className = `text-xs font-bold mt-4 ${color}`;
+            messageEl.textContent = message;
+        }
+
+        function renderTable() {
+            const query = document.getElementById('tableSearch').value.trim().toLowerCase();
+            const rows = students.filter((student) => {
+                return !query || [student.id, student.name, student.seat, student.committee, student.room].some((value) => String(value).toLowerCase().includes(query));
+            });
+            const table = document.getElementById('studentsTable');
+            document.getElementById('studentsCount').textContent = `${students.length} طالب`;
+            document.getElementById('storageStatus').textContent = students.length ? `محفوظ ${students.length} طالب` : 'لا توجد بيانات محفوظة';
+            document.getElementById('emptyState').classList.toggle('hidden', students.length > 0);
+
+            table.innerHTML = rows.map((student, visibleIndex) => {
+                const index = students.indexOf(student);
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-bold ltr-input text-left">${escapeHtml(student.id)}</td>
+                        <td class="p-3 font-bold">${escapeHtml(student.name || 'غير محدد')}</td>
+                        <td class="p-3">${escapeHtml(student.seat || '-')}</td>
+                        <td class="p-3">${escapeHtml(student.committee || '-')}</td>
+                        <td class="p-3">${escapeHtml(student.room || '-')}</td>
+                        <td class="p-3">
+                            <div class="flex items-center justify-center gap-2">
+                                <button type="button" class="editBtn w-9 h-9 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100" data-index="${index}" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button type="button" class="deleteBtn w-9 h-9 rounded-lg bg-red-50 text-red-700 hover:bg-red-100" data-index="${index}" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function resetForm() {
+            document.getElementById('editingIndex').value = '';
+            document.getElementById('formTitle').textContent = 'إضافة طالب';
+            document.getElementById('studentForm').reset();
+        }
+
+        function fillForm(index) {
+            const student = students[index];
+            if (!student) return;
+            document.getElementById('editingIndex').value = index;
+            document.getElementById('formTitle').textContent = 'تعديل طالب';
+            document.getElementById('studentId').value = student.id;
+            document.getElementById('studentName').value = student.name;
+            document.getElementById('seatNumber').value = student.seat;
+            document.getElementById('grade').value = student.grade;
+            document.getElementById('committee').value = student.committee;
+            document.getElementById('room').value = student.room;
+            document.getElementById('location').value = student.location;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.getElementById('dataFile').addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                const text = await file.text();
+                const parsedRows = parseFile(file, text);
+                const normalized = parsedRows.map(normalizeStudent).filter((student) => student.id.length === 10);
+                if (!normalized.length) {
+                    showMessage('لم يتم العثور على سجلات تحتوي على رقم هوية صحيح من 10 أرقام.', 'text-red-600');
+                    return;
+                }
+                students = normalized;
+                saveStudents();
+                resetForm();
+                showMessage(`تم رفع ${students.length} طالب بنجاح.`, 'text-green-700');
+            } catch (error) {
+                showMessage('تعذر قراءة الملف. تأكد من أن الملف بصيغة CSV أو JSON صحيحة.', 'text-red-600');
+            } finally {
+                event.target.value = '';
+            }
+        });
+
+        document.getElementById('studentForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const student = {
+                id: normalizeId(document.getElementById('studentId').value),
+                name: document.getElementById('studentName').value.trim(),
+                seat: document.getElementById('seatNumber').value.trim(),
+                grade: document.getElementById('grade').value.trim(),
+                committee: document.getElementById('committee').value.trim(),
+                room: document.getElementById('room').value.trim(),
+                location: document.getElementById('location').value.trim()
+            };
+
+            if (student.id.length !== 10 || !student.name) {
+                showMessage('رقم الهوية واسم الطالب مطلوبان.', 'text-red-600');
+                return;
+            }
+
+            const editingIndex = document.getElementById('editingIndex').value;
+            const duplicateIndex = students.findIndex((item, index) => item.id === student.id && String(index) !== editingIndex);
+            if (duplicateIndex !== -1) {
+                showMessage('يوجد طالب محفوظ بنفس رقم الهوية.', 'text-red-600');
+                return;
+            }
+
+            if (editingIndex !== '') {
+                students[Number(editingIndex)] = student;
+                showMessage('تم تعديل بيانات الطالب.', 'text-green-700');
+            } else {
+                students.push(student);
+                showMessage('تمت إضافة الطالب.', 'text-green-700');
+            }
+
+            saveStudents();
+            resetForm();
+        });
+
+        document.getElementById('studentsTable').addEventListener('click', (event) => {
+            const editBtn = event.target.closest('.editBtn');
+            const deleteBtn = event.target.closest('.deleteBtn');
+            if (editBtn) {
+                fillForm(Number(editBtn.dataset.index));
+            }
+            if (deleteBtn) {
+                const index = Number(deleteBtn.dataset.index);
+                const student = students[index];
+                if (student && confirm(`هل تريد حذف بيانات الطالب: ${student.name || student.id}؟`)) {
+                    students.splice(index, 1);
+                    saveStudents();
+                    resetForm();
+                    showMessage('تم حذف الطالب من البيانات المحفوظة.', 'text-green-700');
+                }
+            }
+        });
+
+        document.getElementById('tableSearch').addEventListener('input', renderTable);
+        document.getElementById('resetFormBtn').addEventListener('click', resetForm);
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            if (!students.length) {
+                showMessage('لا توجد بيانات لإزالتها.', 'text-slate-500');
+                return;
+            }
+            if (confirm('هل تريد إزالة ملف بيانات الطلاب المحفوظ من هذا المتصفح؟')) {
+                students = [];
+                localStorage.removeItem(STUDENTS_STORAGE_KEY);
+                renderTable();
+                resetForm();
+                showMessage('تمت إزالة ملف البيانات المحفوظ.', 'text-green-700');
+            }
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            if (!students.length) {
+                showMessage('لا توجد بيانات لتصديرها.', 'text-slate-500');
+                return;
+            }
+            const blob = new Blob([JSON.stringify({ students }, null, 2)], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'students-data.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        });
+
+        renderTable();
+    </script>
+</body>
+</html>
