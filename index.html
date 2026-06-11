@@ -144,10 +144,10 @@
                 <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                     ${renderField('رقم الهوية', student.id)}
                     ${renderField('رقم الجلوس', student.seat)}
-                    ${renderField('اللجنة', student.committee)}
-                    ${renderField('القاعة', student.room)}
-                    ${renderField('الصف', student.grade)}
-                    ${renderField('مقر اللجنة', student.location)}
+                    ${renderField('اللجنة', student.committee || student['رقم اللجنة'])}
+                    ${renderField('القاعة', student.room || student['اسم اللجنة'])}
+                    ${renderField('الصف', student.grade || student['الصف/ الفصل'])}
+                    ${renderField('مقر اللجنة', student.location || student['مقر اللجنة'])}
                 </div>
             `;
         }

@@ -32,9 +32,9 @@
 - رقم الهوية: `id`, `studentId`, `nationalId`, `رقم الهوية`, `الهوية`, `السجل المدني`
 - اسم الطالب: `name`, `studentName`, `اسم الطالب`, `الاسم`
 - رقم الجلوس: `seat`, `seatNumber`, `رقم الجلوس`
-- اللجنة: `committee`, `committeeName`, `اللجنة`
-- القاعة: `room`, `hall`, `classroom`, `القاعة`, `الفصل`
-- الصف: `grade`, `class`, `الصف`
+- اللجنة: `committee`, `committeeName`, `اللجنة`, `رقم اللجنة`
+- القاعة: `room`, `hall`, `classroom`, `القاعة`, `الفصل`, `اسم اللجنة`
+- الصف: `grade`, `class`, `الصف`, `الصف/ الفصل`
 - مقر اللجنة: `location`, `place`, `مقر اللجنة`, `المقر`
 
 ## ملاحظة أمنية
