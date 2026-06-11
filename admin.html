@@ -191,7 +191,7 @@
         let students = [];
 
         const fieldMap = {
-            id: ['id', 'studentId', 'nationalId', 'identity', 'رقم الهوية', 'الهوية', 'السجل المدني'],
+            id: ['id', 'studentId', 'nationalId', 'identity', 'رقم الهوية', 'رقم الهوية الوطنية', 'الهوية', 'الهوية الوطنية', 'السجل المدني', 'رقم السجل المدني', 'رقم الهوية/الإقامة', 'رقم الطالب'],
             name: ['name', 'studentName', 'اسم الطالب', 'الاسم'],
             seat: ['seat', 'seatNumber', 'رقم الجلوس', 'رقم الجلوس/المقعد'],
             grade: ['grade', 'class', 'الصف', 'الفصل الدراسي'],
@@ -210,15 +210,36 @@
             }[char]));
         }
 
+        function normalizeDigits(value) {
+            const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            return String(value ?? '').replace(/[٠-٩۰-۹]/g, (digit) => {
+                const arabicIndex = arabicDigits.indexOf(digit);
+                if (arabicIndex !== -1) return String(arabicIndex);
+                return String(persianDigits.indexOf(digit));
+            });
+        }
+
         function normalizeId(value) {
-            return String(value ?? '').replace(/\D/g, '').slice(0, 10);
+            return normalizeDigits(value).replace(/\D/g, '').slice(0, 10);
+        }
+
+        function normalizeKey(value) {
+            return normalizeDigits(value)
+                .toLowerCase()
+                .replace(/[\sـ_\-\/\\:()،,.]+/g, '')
+                .trim();
         }
 
         function getValue(row, key) {
+            const normalizedEntries = Object.entries(row).map(([rowKey, value]) => [normalizeKey(rowKey), value]);
             for (const possibleKey of fieldMap[key]) {
                 if (row[possibleKey] !== undefined && row[possibleKey] !== null && String(row[possibleKey]).trim() !== '') {
                     return row[possibleKey];
                 }
+                const wantedKey = normalizeKey(possibleKey);
+                const found = normalizedEntries.find(([rowKey, value]) => rowKey === wantedKey && String(value ?? '').trim() !== '');
+                if (found) return found[1];
             }
             return '';
         }
@@ -286,9 +307,9 @@
                 }
                 const buffer = await file.arrayBuffer();
                 const workbook = window.XLSX.read(buffer, { type: 'array' });
-                const firstSheetName = workbook.SheetNames[0];
-                if (!firstSheetName) return [];
-                return window.XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName], { defval: '' });
+                return workbook.SheetNames.flatMap((sheetName) => {
+                    return window.XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: '' });
+                });
             }
 
             const text = await file.text();
