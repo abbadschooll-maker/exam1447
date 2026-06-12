@@ -12,6 +12,7 @@
     </script>
     <style>
         body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; }
+        #studentId::placeholder { color: #cbd5e1; opacity: 0.55; }
         .animate-fade-in { animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -20,7 +21,9 @@
     <header id="mainHeader" class="bg-white/85 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 shadow-sm">
         <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3 min-w-0">
-                <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-blue-700 rounded-xl flex items-center justify-center text-white shrink-0"><i class="fa-solid fa-graduation-cap"></i></div>
+                <div class="w-12 h-12 bg-white rounded-xl border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden shrink-0">
+                    <img src="school-logo.png" alt="شعار مدرسة عباد بن بشر الابتدائية" class="w-full h-full object-contain p-1">
+                </div>
                 <div class="min-w-0">
                     <h1 class="font-black text-sm text-slate-900 leading-tight">مدرسة عباد بن بشر الابتدائية</h1>
                     <p class="text-[10px] text-slate-400 font-semibold">تبوك 1447 هـ</p>
@@ -36,13 +39,13 @@
                 <p class="text-xs text-slate-500 font-bold">صفحة الاستعلام عن مقر اللجنة للطالب ورقم الجلوس</p>
             </div>
 
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 max-w-md mx-auto">
-                <form id="searchForm" class="space-y-4">
+            <div id="searchCard" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 max-w-md mx-auto">
+                <form id="searchForm" class="space-y-4" autocomplete="off">
                     <div class="text-center">
                         <label for="studentId" class="block text-xs font-bold text-slate-500 mb-2">رقم الهوية الوطنية</label>
                         <input type="text" id="studentId" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="يرجى إدخال 10 أرقام إنجليزية فقط"
                                class="w-full text-center py-3 bg-slate-50 border border-slate-200 rounded-xl font-black text-lg tracking-widest focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500"
-                               placeholder="1234567890">
+                               placeholder="1234567890" autocomplete="off" autocorrect="off" spellcheck="false">
                         <p class="text-[10px] text-red-500 font-bold mt-2"><i class="fa-solid fa-circle-info ml-1"></i> يرجى إدخال 10 أرقام باللغة الإنجليزية فقط</p>
                     </div>
                     <button id="searchBtn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-md">عرض بطاقة اللجنة</button>
@@ -133,6 +136,7 @@
         }
 
         function renderStudent(student) {
+            document.getElementById('searchCard').classList.add('hidden');
             document.getElementById('emptyPanel').classList.add('hidden');
             const resultPanel = document.getElementById('resultPanel');
             resultPanel.classList.remove('hidden');
@@ -165,11 +169,21 @@
         }
 
         function resetSearch() {
+            document.getElementById('searchCard').classList.remove('hidden');
             document.getElementById('resultPanel').classList.add('hidden');
             document.getElementById('emptyPanel').classList.add('hidden');
             document.getElementById('searchForm').reset();
+            document.getElementById('studentId').value = '';
             document.getElementById('studentId').focus();
             document.getElementById('searchSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function clearSearchState() {
+            document.getElementById('searchCard').classList.remove('hidden');
+            document.getElementById('resultPanel').classList.add('hidden');
+            document.getElementById('emptyPanel').classList.add('hidden');
+            document.getElementById('searchForm').reset();
+            document.getElementById('studentId').value = '';
         }
 
         async function searchStudent(id) {
@@ -203,6 +217,8 @@
                 button.textContent = 'عرض بطاقة اللجنة';
             }
         });
+
+        window.addEventListener('pageshow', clearSearchState);
     </script>
 </body>
 </html>
